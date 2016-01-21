@@ -2,6 +2,7 @@ package ru.xxlabaza.aspect;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -10,8 +11,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,15 +18,10 @@ import org.springframework.stereotype.Component;
  * @version 1.0.0
  * @since Dec 30, 2015 | 12:41
  */
+@Slf4j
 @Aspect
 @Component
 class MyAspect {
-
-    private static final Logger LOGGER;
-
-    static {
-        LOGGER = LoggerFactory.getLogger(MyAspect.class);
-    }
 
     @Before(value = "execution(public " + // method access level
                     "java.lang.String " + // method return type
@@ -35,7 +29,7 @@ class MyAspect {
                     "(java.lang.String)) && args(text)", // method arguments
             argNames = "text")
     public void before (String text) {
-        LOGGER.info("\n\tBEFORE ->\n\tIncoming argument is {}", text);
+        log.info("\n\tBEFORE ->\n\tIncoming argument is {}", text);
     }
 
     @After(value = "execution(public " + // method access level
@@ -44,7 +38,7 @@ class MyAspect {
                    "(java.lang.String)) && args(text)", // method arguments
            argNames = "text")
     public void after (String text) {
-        LOGGER.info("\n\tAFTER ->\n\tIncoming argument is {}", text);
+        log.info("\n\tAFTER ->\n\tIncoming argument is {}", text);
     }
 
     @Around("bean(*Controller)")
@@ -52,7 +46,7 @@ class MyAspect {
         String methodName = ((MethodSignature) joinPoint.getSignature()).getMethod().getName();
         String arguments = Stream.of(joinPoint.getArgs()).map(Object::toString).collect(Collectors.joining(", "));
 
-        LOGGER.info("\n\tAROUND ->\n" +
+        log.info("\n\tAROUND ->\n" +
                     "\tMethod name: {}\n" +
                     "\tArguments: {}",
                     methodName,
@@ -70,12 +64,11 @@ class MyAspect {
             throwing = "exception"
     )
     public void afterThrowing (String text, Exception exception) {
-//        LOGGER.error("\n\tERROR ->\n" +
-//                     "\tIncoming argument is {}\n" +
-//                     "\tException name is {}",
-//                     text,
-//                     exception.getClass().getSimpleName());
-        LOGGER.error("Some error message", exception);
+        log.error("\n\tERROR ->\n" +
+                     "\tIncoming argument is {}\n" +
+                     "\tException name is {}",
+                     text,
+                     exception.getClass().getSimpleName());
     }
 
     @AfterReturning(
@@ -87,6 +80,6 @@ class MyAspect {
             argNames = "text, result"
     )
     public void afterReturning (String text, String result) {
-        LOGGER.info("\n\tAFTER_RETURNING ->\n\tMethod result is {}, Incoming argument is {}", result, text);
+        log.info("\n\tAFTER_RETURNING ->\n\tMethod result is {}, Incoming argument is {}", result, text);
     }
 }

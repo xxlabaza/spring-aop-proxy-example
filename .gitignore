@@ -210,5 +210,3 @@ Temporary Items
 .apdisk
 /target/
 *.pdfmarks
-/src/main/resources/logback.xml
-LogstashSocketAppenderInitializer.java
